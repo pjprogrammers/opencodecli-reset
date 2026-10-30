@@ -38,11 +38,17 @@ rm -rf \
     "$HOME/.local/state/opencode" \
     "$HOME/.cache/opencode"
 
-# Remove the old npm installation logs we identified.
-rm -f \
-    "$HOME/.npm/_logs/2026-10-30T13_55_16_381Z-debug-0.log" \
-    "$HOME/.npm/_logs/2026-10-28T11_49_24_916Z-debug-0.log"
+# Remove npm debug logs containing references to opencode-ai.
+find "$HOME/.npm/_logs" -maxdepth 1 -type f \
+    -name '*-debug-0.log' \
+    -exec grep -il 'opencode-ai' {} + 2>/dev/null |
+while IFS= read -r log_file; do
+    # Display the log being removed.
+    printf 'Removing npm log: %s\n' "$log_file"
 
+    # Delete the matching log.
+    rm -f -- "$log_file"
+done
 
 # ==========================================
 # 4. REMOVE ROOT'S SEPARATE INSTALLATION
