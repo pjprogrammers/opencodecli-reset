@@ -1,4 +1,4 @@
-
+```bash
 #!/usr/bin/env bash
 
 set -e
@@ -122,12 +122,12 @@ hash -r
 
 echo
 echo "=========================================="
-echo "3. REMOVE USER DATA AND NPM LOGS"
+echo "3. REMOVE USER DATA AND INSTALLATION"
 echo "=========================================="
 
-if ask_yes_no "Do you want to delete remaining OpenCode user data, configuration, cache and state?"; then
+if ask_yes_no "Do you want to delete remaining OpenCode user data, configuration, cache, state and installation files?"; then
 
-    # Remove OpenCode's remaining local directories.
+    # Remove OpenCode's remaining local data directories.
     # This can permanently delete saved authentication,
     # sessions, history, configuration and cached data.
 
@@ -139,8 +139,22 @@ if ask_yes_no "Do you want to delete remaining OpenCode user data, configuration
 
     echo "Remaining OpenCode user data removed."
 
+    # Remove the user's separate OpenCode installation directory.
+    # HOME is dynamic, so this works for any normal Linux user.
+    # It removes leftover binaries, wrappers and empty directories.
+
+    if [ -d "$HOME/.opencode" ]; then
+
+        rm -rf -- "$HOME/.opencode"
+
+        echo "User OpenCode installation directory removed: $HOME/.opencode"
+
+    else
+        echo "User OpenCode installation directory not found."
+    fi
+
 else
-    echo "Skipping user data cleanup."
+    echo "Skipping user data and installation cleanup."
 fi
 
 
@@ -182,7 +196,7 @@ fi
 
 
 # ==========================================
-# 4. REMOVE ROOT'S SEPARATE INSTALLATION
+# 4. REMOVE ROOT OPENCODE INSTALLATION
 # ==========================================
 
 echo
@@ -190,7 +204,7 @@ echo "=========================================="
 echo "4. REMOVE ROOT OPENCODE INSTALLATION"
 echo "=========================================="
 
-if ask_yes_no "Do you want to remove the separate OpenCode installation under /root?"; then
+if ask_yes_no "Do you want to remove the separate OpenCode installation and references under /root?"; then
 
     # Check whether a root-owned OpenCode installation exists.
     if sudo test -d /root/.opencode; then
@@ -204,12 +218,20 @@ if ask_yes_no "Do you want to remove the separate OpenCode installation under /r
         echo "No root OpenCode installation found."
     fi
 
-    # Remove the OpenCode PATH entry from root's Bash configuration.
+    # Clean root's Bash configuration if it exists.
     if sudo test -f /root/.bashrc; then
 
+        # Remove the OpenCode installation PATH entry.
         sudo sed -i '\|/root/.opencode/bin|d' /root/.bashrc
 
-        echo "Root Bash PATH entry checked and cleaned."
+        # Remove the standalone OpenCode comment.
+        # This targets only a line containing exactly "# opencode".
+        sudo sed -i '/^[[:space:]]*# opencode[[:space:]]*$/d' /root/.bashrc
+
+        echo "Root Bash PATH entry and standalone OpenCode comment cleaned."
+
+    else
+        echo "Root .bashrc not found."
     fi
 
 else
@@ -265,4 +287,4 @@ else
     echo "Run this manually when needed:"
     echo 'exec "$SHELL" -l'
 fi
-
+```
