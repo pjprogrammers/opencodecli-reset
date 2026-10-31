@@ -14,6 +14,42 @@ A Bash utility to completely remove an existing OpenCode installation's local da
 
 `opencode-clean-reset.sh` automates the cleanup and reinstallation process, including the removal of old configuration files, cached data, saved authentication, session history, and the legacy npm package.
 
+## Versions
+
+This project follows versioned releases to distinguish between its original automated workflow and the newer interactive workflow.
+
+| Version | Release | Description |
+|---|---|---|
+| **v1.0.0** | Initial Release | Fully automated cleanup and reinstallation process. |
+| **v2.0.0** | Latest Release | Interactive cleanup with independent Y/N prompts for each operation. |
+
+### What's New in v2.0.0?
+
+Version 2 introduces an interactive workflow that gives users more control over the cleanup process.
+
+**New features and improvements:**
+
+- **Interactive Y/N Prompts** — Choose whether to execute or skip individual cleanup operations.
+- **Independent Operations** — Each cleanup section has its own confirmation prompt.
+- **Skip Functionality** — Enter `n` to skip an operation and continue with the remaining steps.
+- **Selective Cleanup** — Decide which local data, npm packages, logs, and root installation components should be removed.
+- **Improved User Control** — No longer requires running every cleanup operation automatically.
+- **Flexible Reinstallation** — Choose whether to proceed with the fresh OpenCode v2 installation.
+- **Better Workflow** — Makes the reset process more transparent and customizable.
+
+**v1.0.0 vs v2.0.0**
+
+| Feature | v1.0.0 | v2.0.0 |
+|---|:---:|:---:|
+| Automated cleanup | Yes | Yes |
+| Interactive Y/N prompts | No | Yes |
+| Skip individual operations | No | Yes |
+| Independent cleanup sections | No | Yes |
+| Selective cleanup | No | Yes |
+| Fresh OpenCode v2 installation | Yes | Yes |
+
+The original v1 workflow remains the foundation of the project. Version 2 builds on it by adding user-controlled cleanup.
+
 ## Features
 
 - **Complete Local Reset** — Removes OpenCode's local configuration, data, cache, and state.
@@ -21,8 +57,9 @@ A Bash utility to completely remove an existing OpenCode installation's local da
 - **Authentication Cleanup** — Removes locally stored OpenCode credentials as part of the reset.
 - **Session & History Cleanup** — Deletes local OpenCode session and history data stored in the targeted directories.
 - **Root Installation Cleanup** — Removes the separate `/root/.opencode` installation and its corresponding PATH entry from `/root/.bashrc`.
-- **NPM Log Cleanup** — Deletes two specifically identified npm debug logs from the previous installation.
+- **NPM Log Cleanup** — Finds and deletes matching npm debug logs associated with `opencode-ai`.
 - **Fresh Installation** — Installs OpenCode v2 using the official installer.
+- **Interactive Workflow (v2)** — Allows users to choose which cleanup operations to perform.
 - **Simple Workflow** — Combines the cleanup and reinstallation process in one script.
 - **Free-Model Workflow** — Makes it easier to reconnect a different authorized API key after resetting local OpenCode data.
 
@@ -55,16 +92,31 @@ Run the script as your normal Linux user:
 
 **Do not run the script with `sudo` or as root.** It is designed to run under your regular user account and uses `sudo` only for the necessary root-owned cleanup operations.
 
+### v1.0.0 Workflow
+
+Version 1 performs the cleanup and reinstallation process automatically, without asking for confirmation for each individual operation.
+
+### v2.0.0 Workflow
+
+Version 2 introduces independent Y/N prompts for cleanup operations.
+
+- Enter `y` to execute the displayed operation.
+- Enter `n` to skip that operation and continue.
+- Each section can be handled independently.
+- You can selectively clean up your OpenCode installation instead of automatically executing every operation.
+
 The script performs the following operations:
 
 1. Previews the files targeted by OpenCode's uninstaller.
 2. Runs the OpenCode uninstall command.
 3. Removes the legacy global `opencode-ai` npm package if detected.
 4. Deletes remaining local OpenCode data, configuration, cache, and state.
-5. Removes two specifically identified npm debug logs.
+5. Finds and removes matching npm debug logs.
 6. Removes the separate root installation and its PATH entry, if present.
 7. Installs OpenCode v2 using the official installation script.
 8. Reloads the current login shell.
+
+In v2, the relevant operations can be individually accepted or skipped using the interactive prompts.
 
 Verify the installation:
 
@@ -87,7 +139,7 @@ opencode
 | `~/.local/state/opencode/` | Application state |
 | `~/.cache/opencode/` | Cached files |
 | Global npm `opencode-ai` package | Legacy npm installation |
-| `~/.npm/_logs/` | Two explicitly specified npm debug logs |
+| `~/.npm/_logs/` | Matching npm debug logs containing `opencode-ai` |
 | `/root/.opencode/` | Separate root-owned installation, if present |
 | `/root/.bashrc` | Matching root OpenCode PATH entry |
 
@@ -123,7 +175,7 @@ The cleanup commands permanently delete the targeted local OpenCode directories.
 
 ### 2. npm logs are installation-specific
 
-The script removes two npm logs identified during a previous troubleshooting session. These filenames are specific to that session and may not exist on another system.
+The script searches for npm debug logs containing `opencode-ai` and removes matching files. Other unrelated npm debug logs are not intentionally removed.
 
 ### 3. OpenCode v2 installation
 
@@ -176,4 +228,4 @@ Choose a license appropriate for your project before publishing this utility. If
 
 ---
 
-**OpenCode Clean Reset** — Clean up your local OpenCode CLI, reinstall, and reconnect. Less manual cleanup, more time coding.
+**OpenCode Clean Reset v2.0.0** — Clean up your local OpenCode CLI, reinstall, and reconnect. More control over cleanup, less manual work, more time coding.
